@@ -1,0 +1,8 @@
+inherit gnome2
+
+DESCRIPTION="GTK+ web browser"
+HOMEPAGE="http://kazehakase.sourceforge.jp/"
+SRC_URI="http://osdn.dl.sourceforge.jp/${PN}/30219/${P}.tar.gz"
+
+ACLOCAL_FLAGS="-I macros"
+CYGCONF_ARGS="ac_cv_header_winsock2_h=no"
