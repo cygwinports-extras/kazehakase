@@ -1,0 +1,68 @@
+--- origsrc/kazehakase-0.5.6/configure.ac	2008-10-28 10:09:19.000000000 -0500
++++ src/kazehakase-0.5.6/configure.ac	2009-01-02 02:44:19.378125000 -0600
+@@ -22,13 +22,16 @@
+ case "$host" in
+   *-*-mingw*|*-*-cygwin*)
+     platform_win32=yes
++    no_undefined="-no-undefined"
+     ;;
+   *)
+     platform_win32=no
++    no_undefined=
+     ;;
+ esac
+ AC_MSG_RESULT([$platform_win32])
+ 
++AC_SUBST(no_undefined)
+ AM_CONDITIONAL(OS_WIN32, test "$os_win32" = "yes")
+ AM_CONDITIONAL(PLATFORM_WIN32, test "$platform_win32" = "yes")
+ 
+@@ -417,10 +420,15 @@
+   RUBY_CFLAGS="$RUBY_CFLAGS $rbconfig_CFLAGS "
+   RUBY_LIBS="$rbconfig_LIBRUBYARG $rbconfig_LIBS"
+   RUBY_LDFLAGS="-L$rbconfig_libdir"
++  RUBY_EXT_LDFLAGS="-L$rbconfig_sitearchdir"
++  if test "$platform_win32" = "yes"; then
++    RUBY_LIBS="$RUBY_LIBS -lruby-gtk2 -lruby-glib2"
++  fi
+ 
+   AC_SUBST(RUBY_CFLAGS)
+   AC_SUBST(RUBY_LIBS)
+   AC_SUBST(RUBY_LDFLAGS)
++  AC_SUBST(RUBY_EXT_LDFLAGS)
+ 
+   _SAVE_CFLAGS=$CFLAGS
+   ruby_undef_package_macros="
+--- origsrc/kazehakase-0.5.6/module/embed/webkit-gtk/Makefile.am	2008-10-28 10:09:11.000000000 -0500
++++ src/kazehakase-0.5.6/module/embed/webkit-gtk/Makefile.am	2009-01-02 02:44:19.409375000 -0600
+@@ -31,4 +31,5 @@
+ 	kz-webkit-gtk.h
+ 
+ webkit_gtk_la_LIBADD = 			\
++	$(top_builddir)/src/libkazehakase.la	\
+ 	$(WEBKITGTK_LIBS)
+--- origsrc/kazehakase-0.5.6/module/search/Makefile.am	2008-10-28 10:09:10.000000000 -0500
++++ src/kazehakase-0.5.6/module/search/Makefile.am	2009-01-02 03:06:21.846875000 -0600
+@@ -40,7 +40,9 @@
+ hyper_estraier_la_SOURCES = \
+ 	$(search_common_sources) \
+ 	kz-hyper-estraier-search.c
+-hyper_estraier_la_LIBADD = $(EST_LIBS)
++hyper_estraier_la_LIBADD = \
++	$(top_builddir)/src/libkazehakase.la \
++	$(EST_LIBS)
+ hyper_estraier_la_CPPFLAGS =					\
+ 	 $(EST_CFLAGS)						\
+ 	 $(AM_CPPFLAGS)						\
+--- origsrc/kazehakase-0.5.6/src/Makefile.am	2008-10-28 10:09:18.000000000 -0500
++++ src/kazehakase-0.5.6/src/Makefile.am	2009-01-02 02:44:19.456250000 -0600
+@@ -4,8 +4,7 @@
+ 	  widget prefs_ui sidebar libegg
+ 
+ 
+-libkazehakasedir = $(libdir)/$(PACKAGE)
+-libkazehakase_LTLIBRARIES = libkazehakase.la
++lib_LTLIBRARIES = libkazehakase.la
+ 
+ AM_CPPFLAGS =						\
+ 	-DLOCALEDIR=\""$(localedir)"\"			\
