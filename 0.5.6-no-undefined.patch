@@ -54,15 +54,3 @@
  hyper_estraier_la_CPPFLAGS =					\
  	 $(EST_CFLAGS)						\
  	 $(AM_CPPFLAGS)						\
---- origsrc/kazehakase-0.5.6/src/Makefile.am	2008-10-28 10:09:18.000000000 -0500
-+++ src/kazehakase-0.5.6/src/Makefile.am	2009-01-02 02:44:19.456250000 -0600
-@@ -4,8 +4,7 @@
- 	  widget prefs_ui sidebar libegg
- 
- 
--libkazehakasedir = $(libdir)/$(PACKAGE)
--libkazehakase_LTLIBRARIES = libkazehakase.la
-+lib_LTLIBRARIES = libkazehakase.la
- 
- AM_CPPFLAGS =						\
- 	-DLOCALEDIR=\""$(localedir)"\"			\
