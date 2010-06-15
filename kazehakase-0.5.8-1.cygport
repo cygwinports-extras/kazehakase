@@ -2,11 +2,10 @@ inherit gnome2
 
 DESCRIPTION="GTK+ web browser"
 HOMEPAGE="http://kazehakase.sourceforge.jp/"
-SRC_URI="http://osdn.dl.sourceforge.jp/${PN}/33533/${P}.tar.gz"
+SRC_URI="http://osdn.dl.sourceforge.jp/${PN}/43802/${P}.tar.gz"
 PATCH_URI="
-	0.5.6-no-undefined.patch
+	0.5.8-no-undefined.patch
 	0.5.6-ipv6.patch
-	0.5.6-strcasestr.patch
 "
 
 DIFF_EXCLUDES="kz-ui-expert.xml"

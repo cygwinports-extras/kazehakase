@@ -1,0 +1,95 @@
+--- origsrc/kazehakase-0.5.8/configure.ac	2009-09-28 22:41:32.000000000 -0500
++++ src/kazehakase-0.5.8/configure.ac	2010-06-14 01:55:34.102046300 -0500
+@@ -22,16 +22,20 @@ AC_MSG_CHECKING([for some Win32 platform
+ case "$host" in
+   *-*-mingw*|*-*-cygwin*)
+     platform="win32"
++    no_undefined="-no-undefined"
+     ;;
+   *-apple-darwin*)
+     platform="os x"
++    no_undefined=""
+     ;;
+   *)
+     platform="unix"
++    no_undefined=""
+     ;;
+ esac
+ AC_MSG_RESULT([$platform])
+ 
++AC_SUBST(no_undefined)
+ AM_CONDITIONAL(OS_WIN32, test "$os_win32" = "yes")
+ AM_CONDITIONAL(PLATFORM_WIN32, test "$platform" = "win32")
+ AM_CONDITIONAL(PLATFORM_OSX, test "$platform" = "os x")
+@@ -431,10 +435,15 @@ if test "$ruby_available" = "yes"; then
+   RUBY_CFLAGS="$RUBY_CFLAGS $rbconfig_CFLAGS "
+   RUBY_LIBS="$rbconfig_LIBRUBYARG $rbconfig_LIBS"
+   RUBY_LDFLAGS="-L$rbconfig_libdir"
++  RUBY_EXT_LDFLAGS="-L$rbconfig_sitearchdir"
++  if test "$platform_win32" = "yes"; then
++    RUBY_LIBS="$RUBY_LIBS -lruby-gtk2 -lruby-glib2"
++  fi
+ 
+   AC_SUBST(RUBY_CFLAGS)
+   AC_SUBST(RUBY_LIBS)
+   AC_SUBST(RUBY_LDFLAGS)
++  AC_SUBST(RUBY_EXT_LDFLAGS)
+ 
+   _SAVE_CFLAGS=$CFLAGS
+   ruby_undef_package_macros="
+--- origsrc/kazehakase-0.5.8/dbus/Makefile.am	2009-09-28 22:43:47.000000000 -0500
++++ src/kazehakase-0.5.8/dbus/Makefile.am	2010-06-14 02:20:00.146899200 -0500
+@@ -38,9 +38,9 @@ kz_embed_process_LDADD =
+         $(DBUS_GLIB_LIBS)                       \
+         $(top_builddir)/src/libkazehakase.la 
+ sample_browser_LDADD = 				\
++        libkzdbus.la	\
+         $(GTK_LIBS)	                        \
+         $(DBUS_GLIB_LIBS)                       \
+-	 libkzdbus.la	\
+         $(top_builddir)/src/libkazehakase.la 
+ 
+ kz-dbus-embed-agent-server-bindings.h: kazehakase-embed.xml
+--- origsrc/kazehakase-0.5.8/libegg/pixbufthumbnail/Makefile.am	2009-09-28 22:38:26.000000000 -0500
++++ src/kazehakase-0.5.8/libegg/pixbufthumbnail/Makefile.am	2010-06-14 02:03:26.969092700 -0500
+@@ -26,7 +26,7 @@ testeggpixbufthumbnail_CFLAGS = \
+ 
+ testeggpixbufthumbnail_LDADD = \
+ 	$(EGG_LIBS) \
+-	$(top_builddir)/libegg/pixbufthumbnail/libeggpixbufthumbnail.la
++	libeggpixbufthumbnail.la
+ 
+ testeggpixbufthumbnail_SOURCES = \
+ 	testeggpixbufthumbnail.c
+--- origsrc/kazehakase-0.5.8/module/embed/per-process/Makefile.am	2009-09-28 22:40:53.000000000 -0500
++++ src/kazehakase-0.5.8/module/embed/per-process/Makefile.am	2010-06-14 02:24:14.739461100 -0500
+@@ -48,6 +48,8 @@ per_process_la_SOURCES =		\
+ 	kz-dbus-embed-delegate.h
+ 
+ per_process_la_LIBADD = 			\
++    $(top_builddir)/src/libkazehakase.la		\
++	$(GTK_LIBS)				\
+ 	$(DBUS_GLIB_LIBS)
+ 
+ kz_embed_process_LDADD =                        \
+--- origsrc/kazehakase-0.5.8/module/embed/webkit-gtk/Makefile.am	2009-09-28 22:38:19.000000000 -0500
++++ src/kazehakase-0.5.8/module/embed/webkit-gtk/Makefile.am	2010-06-14 01:55:34.108046600 -0500
+@@ -31,4 +31,5 @@ webkit_gtk_la_SOURCES =			\
+ 	kz-webkit-gtk.h
+ 
+ webkit_gtk_la_LIBADD = 			\
++	$(top_builddir)/src/libkazehakase.la	\
+ 	$(WEBKITGTK_LIBS)
+--- origsrc/kazehakase-0.5.8/module/search/Makefile.am	2009-09-28 22:38:19.000000000 -0500
++++ src/kazehakase-0.5.8/module/search/Makefile.am	2010-06-14 01:55:34.113046900 -0500
+@@ -39,7 +39,9 @@ search_LTLIBRARIES += hyper-estraier.la
+ hyper_estraier_la_SOURCES = \
+ 	$(search_common_sources) \
+ 	kz-hyper-estraier-search.c
+-hyper_estraier_la_LIBADD = $(EST_LIBS)
++hyper_estraier_la_LIBADD = \
++	$(top_builddir)/src/libkazehakase.la \
++	$(EST_LIBS)
+ hyper_estraier_la_CPPFLAGS =					\
+ 	 $(EST_CFLAGS)						\
+ 	 $(AM_CPPFLAGS)						\
